@@ -71,32 +71,63 @@ disease=st.sidebar.selectbox('Disease',(df_con["mesh_term"].unique()))
 phase=st.sidebar.selectbox('Phase',(df_study["phase"].unique()))
 
 location=st.sidebar.selectbox('Location',(df_facil["state"].unique()))
-        
-        
 
+
+## Here we are merging the Study table,Facility Table and the Browse Conditions
+
+df_merge=df_study.merge(df_facil,on="nct_id",how="left")
+df_merge1=df_merge.merge(df_con,on="nct_id",how="left")
+
+
+## we are applying filters on df_merge1
+
+df_merge1=df_merge1[df_merge1['mesh_term']==disease]
+df_merge1=df_merge1[df_merge1['phase']==phase]
+df_merge1=df_merge1[df_merge1['state']==location]
+
+nct_id2=df_merge1["nct_id"].unique()
+
+
+##Sample merg two tables
+
+##"""df_merge=df_study.merge(df_spon,on="nct_id",how="left")"""
+
+        
+        
+## df_con=df_con[df_con['mesh_term']==disease]
 
 
 
 st.subheader('Trail Details')
-st.write(df_study)
+df_study1=df_study[df_study["nct_id"].isin(nct_id2)]
+st.write(df_study1)
+
+st.subheader('Disease Name')
+df_con1=df_con[df_con["nct_id"].isin(nct_id2)]
+st.write(df_con1)
 
 st.subheader('Trail Location')
-st.write(df_facil)
+df_facil1=df_facil[df_facil["nct_id"].isin(nct_id2)]
+st.write(df_facil1)
 
 
 st.subheader('Trail Patient Eligibility')
-st.write(df_elg)
+df_elg1=df_elg[df_elg["nct_id"].isin(nct_id2)]
+st.write(df_elg1)
 
 
 st.subheader('Trail Contacts')
-st.write(df_facilcon)   
+df_facilcon1=df_facilcon[df_facilcon["nct_id"].isin(nct_id2)]
+st.write(df_facilcon1)   
 
-st.subheader('Trail Interventions')     
-st.write(df_int)      
+st.subheader('Trail Interventions')    
+df_int1=df_int[df_int["nct_id"].isin(nct_id2)] 
+st.write(df_int1)      
 
 
 st.subheader('Trail Sponsors')
-st.write(df_spon)
+df_spon1=df_spon[df_spon["nct_id"].isin(nct_id2)]
+st.write(df_spon1)
 
 
 
@@ -105,9 +136,7 @@ st.write(df_spon)
 
 
 
-##merg two tables
 
-df_merge=df_study.merge(df_spon,on="nct_id",how="left")
 
 
 
