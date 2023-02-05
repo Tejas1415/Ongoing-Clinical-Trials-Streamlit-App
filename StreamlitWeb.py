@@ -75,7 +75,7 @@ st.balloons()
 
 st.write("""
          
-# Ongoing Clinical Trails in USA 
+# Ongoing Clinical Trials in USA 
          
         """)
         
@@ -211,7 +211,7 @@ fig = go.Figure(data=go.Choropleth(
 ))
 
 fig.update_layout(
-    title_text = 'Location of Going Clinical Trails in USA State-Wise ',
+    title_text = 'Location of Going Clinical Trials in USA State-Wise ',
     geo_scope='usa', # limite map scope to USA 
     plot_bgcolor='rgb(0,0,0,0)',
     
@@ -223,7 +223,7 @@ fig.update_layout(
 ## Displaying of each Table
 
 
-st.subheader('Trail Details')
+st.subheader('Trial Details')
 st.dataframe(data=df_study1, width=700, height=768)
 ###st.write(df_study1)
 
@@ -255,7 +255,7 @@ st.dataframe(data=df_facilcon1, width=700, height=768)
 
 
 
-st.subheader('Trail Interventions')    
+st.subheader('Trial Interventions')    
 st.dataframe(data=df_int1, width=700, height=768)
 ###st.write(df_int1)      
 
@@ -267,7 +267,7 @@ st.dataframe(data=df_spon1, width=700, height=768)
 
 
 
-st.write('All the Above Data was extracted from the AACT Clinical Trail Database')
+st.write('All the Above Data was extracted from the AACT Clinical Trial Database')
 
 
 
