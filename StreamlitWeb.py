@@ -12,11 +12,14 @@ import streamlit as st
 import plotly.graph_objects as go
 
 
-@st.cache_data
+@st.cache_data(ttl=3600)  # Cache for 1 hour
 def Fetching_Clinical_Data():
 
-    engine = create_engine(f'postgresql://{C.IDUsername}:{C.Password}@{C.Hostname}:5432/{C.Databasename}')
-    
+    engine = create_engine(f'postgresql://{C.IDUsername}:{C.Password}@{C.Hostname}:5432/{C.Databasename}',
+                           pool_pre_ping=True,  # Verify connections before using
+                           pool_recycle=3600    # Recycle connections after 1 hour
+                            )
+     
     
     sql_study = "SELECT nct_id, overall_status, last_known_status, phase, enrollment, enrollment_type FROM ctgov.studies WHERE overall_status IN ('ACTIVE_NOT_RECRUITING', 'AVAILABLE', 'ENROLLING_BY_INVITATION', 'NOT_YET_RECRUITING', 'RECRUITING', 'UNKNOWN', 'TEMPORARILY_NOT_AVAILABLE') AND phase IN ('EARLY_PHASE1', 'PHASE1', 'PHASE1/PHASE2', 'PHASE2', 'PHASE2/PHASE3', 'PHASE3', 'PHASE4')"
     df_study = pd.read_sql(sql_study,con=engine)
