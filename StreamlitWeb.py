@@ -12,15 +12,13 @@ import streamlit as st
 import plotly.graph_objects as go
 
 
-@st.cache()
+@st.cache_data
 def Fetching_Clinical_Data():
-
-    
 
     engine = create_engine(f'postgresql://{C.IDUsername}:{C.Password}@{C.Hostname}:5432/{C.Databasename}')
     
     
-    sql_study = "SELECT nct_id,overall_status,phase,enrollment,enrollment_type FROM ctgov.studies x WHERE (overall_status IN ('Active, not recruiting','Available','Enrolling by invitation','Not yet recruiting','Recruiting','Unknown status')) AND (phase IN ('Early Phase 1','Phase 1','Phase 1/Phase 2','Phase 2','Phase 2/Phase 3','Phase 3','Phase 4'))"
+    sql_study = "SELECT nct_id, overall_status, last_known_status, phase, enrollment, enrollment_type FROM ctgov.studies WHERE overall_status IN ('ACTIVE_NOT_RECRUITING', 'AVAILABLE', 'ENROLLING_BY_INVITATION', 'NOT_YET_RECRUITING', 'RECRUITING', 'UNKNOWN', 'TEMPORARILY_NOT_AVAILABLE') AND phase IN ('EARLY_PHASE1', 'PHASE1', 'PHASE1/PHASE2', 'PHASE2', 'PHASE2/PHASE3', 'PHASE3', 'PHASE4')"
     df_study = pd.read_sql(sql_study,con=engine)
     
     
@@ -90,13 +88,11 @@ phase=st.sidebar.selectbox('Phase',(df_study["phase"].unique()))
 
 
 ## Here we are merging the Study table,Facility Table and the Browse Conditions
-
 df_merge=df_study.merge(df_facil,on="nct_id",how="left")
 df_merge1=df_merge.merge(df_con,on="nct_id",how="left")
 
 
 ## we are applying filters on df_merge1
-
 df_merge1=df_merge1[df_merge1['mesh_term']==disease]
 df_merge1=df_merge1[df_merge1['phase']==phase]
 ###df_merge1=df_merge1[df_merge1['state']==location]
@@ -126,7 +122,7 @@ df_spon1=df_spon[df_spon["nct_id"].isin(nct_id2)]
 ## USA state Abbrev
 
 df_facilcount= df_facil1['state'].value_counts().reset_index()
-df_facilcount=df_facilcount.rename(columns={'index':'State','state':'Count'})
+df_facilcount=df_facilcount.rename(columns={'state':'State','count':'Count'})
 
 
 
