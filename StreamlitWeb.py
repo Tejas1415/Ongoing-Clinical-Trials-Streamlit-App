@@ -25,7 +25,7 @@ def get_engine():
 def Fetching_Clinical_Data():
     
     engine = get_engine()
-    
+
     ## From the study table, get only the required columns one per NCT_ID for only ongoing trials.
     sql_study = "SELECT nct_id, overall_status, last_known_status, phase, enrollment, enrollment_type FROM ctgov.studies WHERE overall_status IN ('ACTIVE_NOT_RECRUITING', 'AVAILABLE', 'ENROLLING_BY_INVITATION', 'NOT_YET_RECRUITING', 'RECRUITING', 'UNKNOWN', 'TEMPORARILY_NOT_AVAILABLE') AND phase IN ('EARLY_PHASE1', 'PHASE1', 'PHASE1/PHASE2', 'PHASE2', 'PHASE2/PHASE3', 'PHASE3', 'PHASE4')"
     df_study = pd.read_sql(sql_study,con=engine)
@@ -57,13 +57,18 @@ def Fetching_Clinical_Data():
     ## Get the sponsors data for the ongoing trials.
     sql_spon="SELECT nct_id,agency_class,lead_or_collaborator,name FROM ctgov.sponsors WHERE (nct_id IN {})".format(t)
     df_spon = pd.read_sql(sql_spon,con=engine)
+
+    ## Here we are merging the Study table,Facility Table and the Browse Conditions
+    df_merge = df_study.merge(df_facil,on="nct_id",how="left")
+    df_merge1 = df_merge.merge(df_con,on="nct_id",how="left")
+    df_merge1 = df_merge1[['nct_id', 'phase', 'mesh_term']]
     
-    return df_study,df_facil,df_con,df_elg,df_facilcon,df_int,df_spon 
+    return df_study,df_facil,df_con,df_elg,df_facilcon,df_int,df_spon, df_merge1
 
 
 
 ## Fetch the latest data from the database.
-df_study,df_facil,df_con,df_elg,df_facilcon,df_int,df_spon = Fetching_Clinical_Data()
+df_study,df_facil,df_con,df_elg,df_facilcon,df_int,df_spon, df_merge1 = Fetching_Clinical_Data()
 
 
 
@@ -99,11 +104,6 @@ phase=st.sidebar.selectbox('Phase',(df_study["phase"].unique()))
 
 
 ############# Based on the filters and filter the cached data to display relevant tables in the app.
-
-## Here we are merging the Study table,Facility Table and the Browse Conditions
-df_merge=df_study.merge(df_facil,on="nct_id",how="left")
-df_merge1=df_merge.merge(df_con,on="nct_id",how="left")
-
 
 ## we are applying filters on df_merge1
 df_merge1=df_merge1[df_merge1['mesh_term']==disease]
