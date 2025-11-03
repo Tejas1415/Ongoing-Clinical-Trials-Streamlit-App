@@ -11,7 +11,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 
-@st.cache_data(ttl=3600)  # Cache for 1 hour
+@st.cache_data(ttl=3600, max_entries=1)  # Cache for 1 hour, avoid cache growth
 def Fetching_Clinical_Data():
     # Use AACTConfig.py to get the engine connected to the database
     #import AACTConfig as C
