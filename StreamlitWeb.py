@@ -10,15 +10,21 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
-
-@st.cache_data(ttl=3600, max_entries=1)  # Cache for 1 hour, avoid cache growth
-def Fetching_Clinical_Data():
+@st.cache_resource
+def get_engine():
     # Use AACTConfig.py to get the engine connected to the database
     #import AACTConfig as C
     #engine = create_engine(f'postgresql://{C.IDUsername}:{C.Password}@{C.Hostname}:5432/{C.Databasename}', pool_pre_ping=True, pool_recycle=3600)     # Verify connections before using, # Recycle connections after 1 hour
 
     # Use streamlit secrets to get the engine connected to the database     
     engine = create_engine(f'postgresql://{st.secrets["IDUsername"]}:{st.secrets["Password"]}@{st.secrets["Hostname"]}:{st.secrets["Port"]}/{st.secrets["Databasename"]}', pool_pre_ping=True, pool_recycle=3600)
+    
+    return engine
+
+@st.cache_data(ttl=3600, max_entries=1)  # Cache for 1 hour, avoid cache growth
+def Fetching_Clinical_Data():
+    
+    engine = get_engine()
     
     ## From the study table, get only the required columns one per NCT_ID for only ongoing trials.
     sql_study = "SELECT nct_id, overall_status, last_known_status, phase, enrollment, enrollment_type FROM ctgov.studies WHERE overall_status IN ('ACTIVE_NOT_RECRUITING', 'AVAILABLE', 'ENROLLING_BY_INVITATION', 'NOT_YET_RECRUITING', 'RECRUITING', 'UNKNOWN', 'TEMPORARILY_NOT_AVAILABLE') AND phase IN ('EARLY_PHASE1', 'PHASE1', 'PHASE1/PHASE2', 'PHASE2', 'PHASE2/PHASE3', 'PHASE3', 'PHASE4')"
